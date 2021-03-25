@@ -1,0 +1,46 @@
+name: Scheduled backup
+
+# 日曜日の18時(UTC) -> 月曜日の3時(JST)に処理実行
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+
+jobs:
+  build:
+    name: backup
+    runs-on: ubuntu-latest
+    steps:
+      - name: export hasura metadata
+        uses: tibotiber/hasura-action@master
+        with:
+          args: metadata export
+        env:
+          HASURA_ENDPOINT: ${{ secrets.HASURA_ENDPOINT }}
+      - name: console
+        run: ls
+      - name: upload hasura metadata to Google Drive
+        uses: satackey/action-google-drive@v1
+        with:
+          skicka-tokencache-json: ${{ secrets.SKICKA_TOKENCACHE_JSON }}
+          upload-from: ./
+          upload-to: /path/to/upload
+      - name: dump heroku data
+        run: |
+          PGPASSWORD=${{ secrets.HEROKU_PGPASSWORD }} pg_dump \
+          --host=ec2-52-5-176-53.compute-1.amazonaws.com \
+          --port=5432 \
+          --user=${{ secrets.HEROKU_USER }} \
+          --format=custom \
+          --no-privileges \
+          --schema=public \
+          --blobs \
+          --dbname=db5nb3h1386f2p \
+          --file ~/heroku_$(date '+%Y%m%d').dump
+      - name: console
+        run: ls
+      - name: upload heroku data to Google Drive
+        uses: satackey/action-google-drive@v1
+        with:
+          skicka-tokencache-json: ${{ secrets.SKICKA_TOKENCACHE_JSON }}
+          upload-from: ./
+          upload-to: /path/to/upload
