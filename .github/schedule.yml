@@ -16,6 +16,7 @@ jobs:
           args: metadata export
         env:
           HASURA_ENDPOINT: ${{ secrets.HASURA_ENDPOINT }}
+          HASURA_ADMIN_SECRET: ${{ secrets.HASURA_ADMIN_SECRET }}
       - name: console
         run: ls
       - name: upload hasura metadata to Google Drive
