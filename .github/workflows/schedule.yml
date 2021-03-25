@@ -3,7 +3,7 @@ name: Scheduled backup
 # 日曜日の18時(UTC) -> 月曜日の3時(JST)に処理実行
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/5 * * * *'
 
 jobs:
   # This workflow contains a single job called "build"
